@@ -93,6 +93,30 @@ def get_booking_data_from_gcs(output_path):
     df.to_parquet(output_path, index=False)
     print(f'output to {output_path}')
     
+@task()
+def get_customer_data_from_gcs(output_path):
+    # read data
+    df = pd.read_csv('data/customer.csv', dtype={'phone': str})
+    
+    # save as parquet 
+    df.to_parquet(output_path, index=False)
+    print(f'output to {output_path}')
+    
+
     
 # @task()
 # booking timestamp < departure timestamp
+
+@dag(default_args=default_args, schedule_interval='@once', start_date=days_ago(1), tags=['practice'])
+def flight_data_pipeline():
+    """
+    load all data into BigQuery
+    """
+    
+    t1 = get_airport_data_from_gcs(output_path=airport_data_output_path)
+    t2 = get_booking_data_from_gcs(output_path=booking_data_output_path)
+    t3 = get_country_data_from_website(output_path=country_data_output_path)
+    t4 = get_customer_data_from_gcs(output_path=customer_data_output_path)
+    t5 = get_flight_data_from_gcs(output_path=flight_data_output_path)
+    
+    
