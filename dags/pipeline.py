@@ -133,7 +133,17 @@ def flight_data_pipeline():
     t5 = get_flight_data_from_gcs(output_path=flight_data_output_path)
     t6 = merge_booking_flight_and_clean(booking_data_path=booking_data_output_path, flight_data_path=flight_data_output_path)
     
+    t7 = BashOperator(
+        task_id = 'bq_load',
+        bash_command = '''
+        bq load --source_format=PARQUET flight_analysis.booking_with_flight gs://;
+        bq load --source_format=PARQUET flight_analysis.airport gs://;
+        bq load --source_format=PARQUET flight_analysis.country gs://;
+        bq load --source_format=PARQUET flight_analysis.customer gs://
+        '''
+    )
     [t2, t5] >> t6
+    [t1, t3, t4, t6] >> t7
     
     
     
