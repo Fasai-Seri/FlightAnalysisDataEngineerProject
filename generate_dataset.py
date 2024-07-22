@@ -34,8 +34,9 @@ with open('./data/customer.csv', 'w') as f:
 
 # generate booking data
 with open('./data/booking.csv', 'w') as f:
-    f.write('booking_id,flight_id,customer_id,quantity\n')
+    f.write('booking_id,booking_timestamp,flight_id,customer_id,quantity\n')
     for i in range(100000):
+        booking_timestamp = random_timestamp()
         flight_id = random.randrange(0, 9999)
         customer_id = random.randrange(0, 9999)
         quantity = random.randrange(1, 5)
