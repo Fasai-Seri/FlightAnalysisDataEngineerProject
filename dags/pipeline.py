@@ -39,3 +39,18 @@ def get_flight_data_from_gcs(output_path):
     # save as parquet
     df.to_parquet(output_path, index=False)
     print(f"Output to {output_path}")
+    
+@task()
+def get_airport_data_from_gcs(output_path):
+    df = pd.read_csv('data/airport.csv', ';')
+
+    # remove coordinates column
+    df.drop(columns='coordinates', inplace=True)
+
+    # clean and convert to appropriate data type
+    df['City Name geo_name_id'] = df['City Name geo_name_id'].replace(r'\N', None).astype('Int64')
+    df['Country Name geo_name_id'] = df['Country Name geo_name_id'].astype('Int64')
+    
+    # save as parquet
+    df.to_parquet(output_path, index=False)
+    print(f"output to {output_path}")
