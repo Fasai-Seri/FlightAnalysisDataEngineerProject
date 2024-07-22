@@ -15,9 +15,11 @@ flight_data_output_path = '/home/airflow/gcs/data/cleaned_flight_data.parquet'
 airport_data_output_path = '/home/airflow/gcs/data/cleaned_airport_data.parquet'
 booking_data_output_path = '/home/airflow/gcs/data/cleaned_booking_data.parquet'
 customer_data_output_path = '/home/airflow/gcs/data/cleaned_customer_data.parquet'
+country_data_output_path = '/home/airflow/gcs/data/cleaned_country_data.parquet'
 
 @task()
 def get_flight_data_from_gcs(output_path):
+    # read a file
     df = pd.read_csv('data/flight.csv')
 
     # flight can't depart and arrive in the same airport
@@ -42,21 +44,42 @@ def get_flight_data_from_gcs(output_path):
     
 @task()
 def get_airport_data_from_gcs(output_path):
+    # read a file
     df = pd.read_csv('data/airport.csv', ';')
 
-    # remove coordinates column
-    df.drop(columns='coordinates', inplace=True)
-
-    # clean and convert to appropriate data type
-    df['City Name geo_name_id'] = df['City Name geo_name_id'].replace(r'\N', None).astype('Int64')
-    df['Country Name geo_name_id'] = df['Country Name geo_name_id'].astype('Int64')
-    
     # transform column names
     df.columns = df.columns.str.lower().str.replace(' ', '_')
+
+    # remove coordinates column
+    df.drop(columns=['coordinates', 'country_name'], inplace=True)
+
+    # clean and convert to appropriate data type
+    df['city_name_geo_name_id'] = df['city_name_geo_name_id'].replace(r'\N', None).astype('Int64')
+    df['country_name_geo_name_id'] = df['country_name_geo_name_id'].astype('Int64')
     
     # save as parquet
     df.to_parquet(output_path, index=False)
     print(f"output to {output_path}")
+
+@task()
+def get_country_data_from_website(output_path):
+    # read data from html
+    df = pd.read_html('https://countrycode.org/')
+    df = df[0]
+    
+    # rename columns
+    df.columns = df.columns.str.lower().str.replace(' ', '_')
+    
+    # select only 2-digit iso codes
+    df['iso_codes'] = df['iso_codes'].str.extract('(^\w{2})')
+    df.rename(columns={'iso_codes': 'iso_code_2_digits'}, inplace=True)
+    
+    # select only necessary columns
+    df = df.iloc[:,0:3]
+    
+    # save as parquet
+    df.to_parquet(output_path, index=False)
+    print(f'output to {output_path}')
     
 # @task()
 # booking timestamp < departure timestamp
