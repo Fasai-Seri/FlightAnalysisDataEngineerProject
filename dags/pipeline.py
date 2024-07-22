@@ -80,6 +80,19 @@ def get_country_data_from_website(output_path):
     # save as parquet
     df.to_parquet(output_path, index=False)
     print(f'output to {output_path}')
+
+@task()
+def get_booking_data_from_gcs(output_path):  
+    # read data
+    df = pd.read_csv('data/booking.csv')
+    
+    # convert to datetime
+    df['booking_timestamp'] = pd.to_datetime(df['booking_timestamp']) 
+    
+    # save as parquet
+    df.to_parquet(output_path, index=False)
+    print(f'output to {output_path}')
+    
     
 # @task()
 # booking timestamp < departure timestamp
