@@ -14,12 +14,12 @@ def random_timestamp(start_year=2010, end_year=2024):
 airport = pd.read_csv('./data/airport.csv', delimiter=';')
 
 with open('./data/flight.csv', 'w') as f:
-    f.write('flight_id,departure_airport,destination_airport,departing_timestamp,duration(hours),price(baht),flight_class\n')
+    f.write('flight_id,departure_airport,destination_airport,departing_timestamp,duration_hours,price_baht,flight_class\n')
     for i in range(10000):
         departure_airport = random.choice(airport['Airport Code'])
         destination_airport = random.choice(airport['Airport Code'])
         departing_timestamp = random_timestamp()
-        duration = random.randrange(0,15)
+        duration = random.randrange(1,15)
         price = random.randrange(500, 50000)
         flight_class = random.choice(['Economy', 'Business', 'First'])
         f.write(f'{i},{departure_airport},{destination_airport},{departing_timestamp},{duration},{price},{flight_class}\n')
