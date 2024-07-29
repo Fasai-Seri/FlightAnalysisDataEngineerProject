@@ -23,14 +23,24 @@ with open('./data/flight.csv', 'w') as f:
         price = random.randrange(500, 50000)
         flight_class = random.choice(['Economy', 'Business', 'First'])
         f.write(f'{i},{departure_airport},{destination_airport},{departing_timestamp},{duration},{price},{flight_class}\n')
+
+# extract country data
+df = pd.read_html('https://countrycode.org/')
+df = df[0]
+df.to_csv('./data/country.csv')
         
 # generate customer data
 fake = Faker()
 
+country = pd.read_csv('./data/country.csv')
+
 with open('./data/customer.csv', 'w') as f:
-    f.write('customer_id,first_name,last_name,email,phone\n')
+    f.write('customer_id,first_name,last_name,email,phone,country_code\n')
     for i in range(10000):
-        f.write(f'{i},{fake.name().split()[0]},{fake.name().split()[0]},{fake.email()},{fake.phone_number()}\n')
+        choices = list('1234567890')
+        phone = ''.join(['0'] + random.choices(choices, k=9))
+        country_code = random.choice(list(country['ISO CODES'].apply(lambda s: s[:2])))
+        f.write(f'{i},{fake.name().split()[0]},{fake.name().split()[0]},{fake.email()},{phone},{country_code}\n')
 
 # generate booking data
 with open('./data/booking.csv', 'w') as f:
@@ -40,4 +50,4 @@ with open('./data/booking.csv', 'w') as f:
         flight_id = random.randrange(0, 9999)
         customer_id = random.randrange(0, 9999)
         quantity = random.randrange(1, 5)
-        f.write(f'{i},{flight_id},{customer_id},{quantity}\n')
+        f.write(f'{i},{booking_timestamp},{flight_id},{customer_id},{quantity}\n')
