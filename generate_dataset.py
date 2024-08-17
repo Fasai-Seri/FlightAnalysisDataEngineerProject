@@ -1,8 +1,11 @@
-import pandas as pd
-import requests
 import random
 import datetime
+import pandas as pd
 from faker import Faker
+
+# extract airport data
+df = pd.read_csv('https://data.opendatasoft.com/api/explore/v2.1/catalog/datasets/airports-code@public/exports/csv?lang=en&timezone=Asia%2FJakarta&use_labels=true&delimiter=%3B', delimiter=';')
+df.to_csv('data/airport.csv', index=False)
 
 # generate flight dataset from extracted airport data
 def random_timestamp(start_year=2010, end_year=2024):
@@ -11,11 +14,11 @@ def random_timestamp(start_year=2010, end_year=2024):
     random_date = start_date + (end_date - start_date) * random.random()
     return random_date
 
-airport = pd.read_csv('./data/airport.csv', delimiter=';')
+airport = pd.read_csv('./data/airport.csv')
 
 with open('./data/flight.csv', 'w') as f:
     f.write('flight_id,departure_airport,destination_airport,departing_timestamp,duration_hours,price_baht,flight_class\n')
-    for i in range(10000):
+    for i in range(200000):
         departure_airport = random.choice(airport['Airport Code'])
         destination_airport = random.choice(airport['Airport Code'])
         departing_timestamp = random_timestamp()
@@ -36,7 +39,7 @@ country = pd.read_csv('./data/country.csv')
 
 with open('./data/customer.csv', 'w') as f:
     f.write('customer_id,first_name,last_name,email,phone,country_code\n')
-    for i in range(10000):
+    for i in range(100000):
         choices = list('1234567890')
         phone = ''.join(['0'] + random.choices(choices, k=9))
         country_code = random.choice(list(country['ISO CODES'].apply(lambda s: s[:2])))
@@ -45,7 +48,7 @@ with open('./data/customer.csv', 'w') as f:
 # generate booking data
 with open('./data/booking.csv', 'w') as f:
     f.write('booking_id,booking_timestamp,flight_id,customer_id,quantity\n')
-    for i in range(100000):
+    for i in range(400000):
         booking_timestamp = random_timestamp()
         flight_id = random.randrange(0, 9999)
         customer_id = random.randrange(0, 9999)
