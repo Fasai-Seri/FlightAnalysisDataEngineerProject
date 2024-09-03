@@ -24,3 +24,5 @@ flight_data = flight_data.withColumn('departing_timestamp', to_timestamp(flight_
 
 # save as parquet
 flight_data.write.parquet(output_path)
+
+spark.stop()

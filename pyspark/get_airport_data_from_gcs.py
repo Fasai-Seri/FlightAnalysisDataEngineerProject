@@ -12,7 +12,7 @@ for old_col_name, new_column_name in airport_new_col_name.items():
 # remove coordinates column
 airport_data = airport_data.drop('coordinates', 'country_name')
 
-# remove missing data
+# remove missing data (consider important column)
 airport_data = airport_data.na.drop(subset=['country_code'])
 
 # clean city_name_geo_name_id column
@@ -24,3 +24,5 @@ airport_data = airport_data.withColumn('country_name_geo_name_id', airport_data[
 
 # save as parquet
 flight_data.write.parquet(output_path)
+
+spark.stop()
