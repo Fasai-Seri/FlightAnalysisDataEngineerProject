@@ -2,7 +2,7 @@ from pyspark.sql import SparkSession
 spark = SparkSession.builder.appName('clean_airport_data').getOrCreate()
 
 # read a file
-airport_data = spark.read.csv(input_path, header=True)
+airport_data = spark.read.csv(input_path, header=True, inferSchema=True)
 
 # transform column names
 airport_new_col_name = {col: col.lower().replace(' ', '_') for col in airport_data.columns}
