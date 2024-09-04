@@ -4,9 +4,7 @@ from pyspark.sql import SparkSession
 spark = SparkSession.builder.appName('merge_booking_flight_and_clean').getOrCreate()
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--flight_input_path", required=True)
-parser.add_argument("--booking_input_path", required=True)
-parser.add_argument("--output_path", required=True)
+parser.add_argument("--bucket_name", required=True)
 args = parser.parse_args()
 
 def get_flight_data_from_gcs(input_path):
@@ -32,20 +30,24 @@ def get_booking_data_from_gcs(input_path):
     booking_data = spark.read.csv(input_path, header=True, inferSchema=True)
     return booking_data
 
-def merge_booking_flight_and_clean():
+def merge_booking_flight_and_clean(booking_data, flight_data):
     # merge data
-    joined_booking_flight = booking_data.join(flight_data, on='flight_id', how="inner")
+    joined_booking_flight = flight_data.join(booking_data, on='flight_id', how="inner")
 
     # remove records with booking timestamp more than departure timestamp
     joined_booking_flight = joined_booking_flight.filter('booking_timestamp < departing_timestamp')
 
     return joined_booking_flight
 
-flight_data = get_flight_data_from_gcs(args.flight_input_path)
-booking_data = get_booking_data_from_gcs(args.booking_input_path)
+flight_data = get_flight_data_from_gcs(f'gs://{args.bucket_name}/data/flight.csv')
+booking_data = get_booking_data_from_gcs(f'gs://{args.bucket_name}/data/booking.csv')
 joined_booking_flight = merge_booking_flight_and_clean(booking_data, flight_data)
 
-# save as parquet
-joined_booking_flight.write.mode('overwrite').parquet(args.output_path)
-
+# write in Google BigQuery
+joined_booking_flight.write.format('bigquery') \
+        .option("table", "flight_analysis.booking_with_flight") \
+        .option("temporaryGcsBucket", args.bucket_name) \
+        .mode("overwrite") \
+        .save()
+        
 spark.stop()

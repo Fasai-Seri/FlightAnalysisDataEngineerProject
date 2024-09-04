@@ -5,12 +5,11 @@ from pyspark.sql.functions import regexp_extract
 spark = SparkSession.builder.appName('clean_country_data').getOrCreate()
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--input_path", required=True)
-parser.add_argument("--output_path", required=True)
+parser.add_argument("--bucket_name", required=True)
 args = parser.parse_args()
 
 # read a file
-country_data = spark.read.csv(args.input_path, header=True, inferSchema=True)
+country_data = spark.read.csv(f'gs://{args.bucket_name}/data/country.csv', header=True, inferSchema=True)
 
 # rename columns
 country_new_col_name = {col: col.lower().replace(' ', '_') for col in country_data.columns}
@@ -23,7 +22,11 @@ country_data = country_data.withColumn('iso_code_2_digits', regexp_extract('iso_
 # select only necessary columns
 country_data = country_data.select('country', 'iso_code_2_digits')
 
-# save as parquet
-country_data.write.mode('overwrite').parquet(args.output_path)
-
+# write in Google BigQuery
+country_data.write.format('bigquery') \
+        .option("table", "flight_analysis.country") \
+        .option("temporaryGcsBucket", args.bucket_name) \
+        .mode("overwrite") \
+        .save()
+        
 spark.stop()
