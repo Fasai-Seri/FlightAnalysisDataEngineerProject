@@ -1,3 +1,8 @@
+"""
+My first version using Pandas to transform data 
+Find pipeline using PySpark in pipeline_with_spark.py
+"""
+
 from airflow.models import DAG
 from airflow.decorators import dag, task
 from airflow.operators.bash import BashOperator
@@ -51,7 +56,7 @@ def get_flight_data_from_gcs(output_path):
 @task()
 def get_airport_data_from_gcs(output_path):
     # read a file
-    df = pd.read_csv('/home/airflow/gcs/data/airport.csv', delimiter=';')
+    df = pd.read_csv('/home/airflow/gcs/data/airport.csv')
 
     # transform column names
     df.columns = df.columns.str.lower().str.replace(' ', '_')
@@ -59,7 +64,7 @@ def get_airport_data_from_gcs(output_path):
     # remove coordinates column
     df.drop(columns=['coordinates', 'country_name'], inplace=True)
 
-    # remove missing data
+    # remove missing data (consider important column)
     df.dropna(inplace=True, subset='country_code')
 
     # clean and convert to appropriate data type
