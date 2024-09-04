@@ -24,6 +24,6 @@ country_data = country_data.withColumn('iso_code_2_digits', regexp_extract('iso_
 country_data = country_data.select('country', 'iso_code_2_digits')
 
 # save as parquet
-country_data.write.parquet(args.output_path)
+country_data.write.mode('overwrite').parquet(args.output_path)
 
 spark.stop()

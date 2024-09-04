@@ -30,6 +30,6 @@ airport_data = airport_data.withColumn('city_name_geo_name_id', airport_data['ci
 airport_data = airport_data.withColumn('country_name_geo_name_id', airport_data['country_name_geo_name_id'].cast('int'))
 
 # save as parquet
-airport_data.write.parquet(args.output_path)
+airport_data.write.mode('overwrite').parquet(args.output_path)
 
 spark.stop()

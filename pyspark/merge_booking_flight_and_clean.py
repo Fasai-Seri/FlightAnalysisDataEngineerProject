@@ -46,6 +46,6 @@ booking_data = get_booking_data_from_gcs(args.booking_input_path)
 joined_booking_flight = merge_booking_flight_and_clean(booking_data, flight_data)
 
 # save as parquet
-joined_booking_flight.write.parquet(args.output_path)
+joined_booking_flight.write.mode('overwrite').parquet(args.output_path)
 
 spark.stop()
