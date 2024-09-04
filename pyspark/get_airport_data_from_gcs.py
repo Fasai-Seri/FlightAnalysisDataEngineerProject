@@ -1,8 +1,15 @@
+import argparse
 from pyspark.sql import SparkSession
+
 spark = SparkSession.builder.appName('clean_airport_data').getOrCreate()
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--input_path", required=True)
+parser.add_argument("--output_path", required=True)
+args = parser.parse_args()
+
 # read a file
-airport_data = spark.read.csv(input_path, header=True, inferSchema=True)
+airport_data = spark.read.csv(args.input_path, header=True, inferSchema=True)
 
 # transform column names
 airport_new_col_name = {col: col.lower().replace(' ', '_') for col in airport_data.columns}
@@ -23,6 +30,6 @@ airport_data = airport_data.withColumn('city_name_geo_name_id', airport_data['ci
 airport_data = airport_data.withColumn('country_name_geo_name_id', airport_data['country_name_geo_name_id'].cast('int'))
 
 # save as parquet
-flight_data.write.parquet(output_path)
+airport_data.write.parquet(args.output_path)
 
 spark.stop()
