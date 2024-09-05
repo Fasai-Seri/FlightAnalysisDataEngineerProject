@@ -4,5 +4,5 @@ After completing several courses focused on data engineering, I decided to work 
 In this project, let’s assume that I served as the data engineer for an airline corporation, tasked with developing dashboards to gain insights into customer behavior and empower data-driven decision-making.
 
 You can read the details on the following blogs  
-[first version (using Pandas)](https://medium.com/@fasaiserikijcharoen/how-i-created-my-first-data-engineer-project-5a6f3f0db6a9)  
-[improved version (using Spark)](https://medium.com/@fasaiserikijcharoen/how-i-created-my-first-data-engineer-project-improved-de6296dce2ef)
+[First Version (Using Pandas)](https://medium.com/@fasaiserikijcharoen/how-i-created-my-first-data-engineer-project-5a6f3f0db6a9)  
+[Improved Version (Using Spark)](https://medium.com/@fasaiserikijcharoen/how-i-created-my-first-data-engineer-project-improved-de6296dce2ef)
